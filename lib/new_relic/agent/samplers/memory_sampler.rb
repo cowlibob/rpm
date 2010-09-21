@@ -26,6 +26,8 @@ module Samplers
         @sampler = ShellPS.new("ps -o rss")
       elsif platform =~ /solaris/
         @sampler = ShellPS.new("/usr/bin/ps -o rss -p")
+      elsif platform =~ /win32|mingw/
+        @sampler = Win32WMI.new
       end
       
       raise Unsupported, "Unsupported platform for getting memory: #{platform}" if @sampler.nil?
@@ -88,6 +90,26 @@ module Samplers
       end
       def to_s
         "JRuby Java heap sampler"
+      end
+    end
+
+    class Win32WMI < Base
+      def initialize()
+        require 'win32ole'
+        @moniker ||= 'winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2'
+        @wmi ||= WIN32OLE.connect(@moniker)
+      end
+      # Current number of megabytes this process has allocated that cannot be shared with other processes.
+      def get_memory
+        raise "Failed to connect to WMI using win32OLE." if @wmi.nil?
+        processes = @wmi.execQuery("Select * from Win32_PerfRawData_PerfProc_Process where IDProcess = #{$$}")
+        processes.each do |p| 
+          return p.PrivateBytes.to_i / (1024 * 1024).to_f
+        end
+        
+      end  
+      def to_s
+        "Windows WMI sampler"
       end
     end
 
