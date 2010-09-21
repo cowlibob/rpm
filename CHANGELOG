@@ -1,3 +1,38 @@
+v2.13.1
+  * Add missing require in rails 3 framework control
+
+v2.13.0
+  * developer mode is now a rack middleware and can be used on any framework;
+    it is no longer supported automatically on versions of Rails prior to 2.3;
+    see README for details
+  * memcache key recording for transaction traces
+  * use system_timer gem if available, fall back to timeout lib
+  * address instability issues in JRuby 1.2
+  * renamed executable 'newrelic_cmd' to 'newrelic'; old name still supported
+    for backward compatibility
+  * added 'newrelic install' command to install a newrelic.yml file in the
+    current directory
+  * optimization to execution time measurement
+  * optimization to startup sequence
+  * change startup sequence so that instrumentation is installed after all
+    other gems and plugins have loaded
+  * add option to override automatic flushing of data on exit--send_data_on_exit
+    defaults to 'true'
+  * ignored errors no longer affect apdex score
+  * added record_transaction method to the api to allow recording
+    details from web and background transactions occurring outside RPM
+  * fixed a bug related to enabling a gold trial / upgrade not sending
+    trasaction traces correctly
+    
+v2.12.3
+  * fix regression in startup sequence
+
+v2.12.2
+  * fix for regression in Rails 2.1 inline rendering
+  * workaround bug found in some rubies that caused a segv and/or NoMemoryError
+    when deflating content for upload
+  * avoid creating connection thread in unicorn/passenger spawners
+
 v2.12.1
   * fix bug in profile mode
   * fix race condition in Delayed::Job instrumentation loading
@@ -13,7 +48,7 @@ v2.11.2
   * fix for unicorn not reporting when the proc line had 'master' in it
   * fix regression for passenger 2.0 and earlier
   * fix after_fork in the shim
-
+  
 v2.11.1
   * republished gem without generated rdocs
 
